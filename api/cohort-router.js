@@ -13,7 +13,7 @@ const knexConfig = {
 const db = knex(knexConfig);
 
 // localhost:3300/api/cohorts
-// GET app
+// GET
 router.get('/', (req, res) => {
     db('cohorts')
     .then(cohorts => {
@@ -22,6 +22,22 @@ router.get('/', (req, res) => {
     .catch(error => {
       res.status(500).json(error);
     }); 
+});
+
+// localhost:3300/api/cohorts/:id
+// GET by id
+router.get('/:id', (req, res) => {
+    const { id } = req.params;
+  
+    db('cohorts')
+    .where({ id })
+    .first()
+    .then(cohort => {
+      res.status(200).json(cohort);
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
 });
 
 
