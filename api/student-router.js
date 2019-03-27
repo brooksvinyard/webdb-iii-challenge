@@ -12,46 +12,54 @@ const knexConfig = {
 
 const db = knex(knexConfig);
 
-// localhost:4444/api/cohorts
-// GET all cohorts
+// localhost:4444/api/students
+// GET all students
 router.get('/', (req, res) => {
-    db('cohorts')
-    .then(cohorts => {
-      res.status(200).json(cohorts);
+    db('students')
+    .then(students => {
+      res.status(200).json(students);
     })
     .catch(error => {
       res.status(500).json(error);
     }); 
 });
 
-// localhost:4444/api/cohorts/:id
-// GET by id
+// localhost:4444/api/students/:id
+// SELECT students.name, students.id, cohorts.name as CohortName
+// FROM students
+// LEFT JOIN cohorts 
+// ON students.cohort_id = cohorts.id 
+// WHERE students.id
+
 router.get('/:id', (req, res) => {
-    const { id } = req.params;
-  
-    db('cohorts')
-    .where({ id })
+    const id  = req.params.id;
+
+    db('students')
+    .select('students.name', 'students.id', 'cohorts.name as cohort')
+    .where('students.id', id)
     .first()
-    .then(cohort => {
-      res.status(200).json(cohort);
+    .leftJoin('cohorts', 'students.cohort_id', 'cohorts.id')
+    .then(student => {
+      res.status(200).json(student);
     })
     .catch(error => {
       res.status(500).json(error);
     });
 });
 
-// localhost:4444/api/cohorts/
-// POST a new cohort
+
+// localhost:4444/api/students/
+// POST a new student
 router.post('/', (req, res) => {
-    db('cohorts')
+    db('students')
     .insert(req.body)
     .then(ids => {
       const id = ids[0];
-      db('cohorts')
+      db('students')
       .where({ id })
       .first()
-      .then(cohort => {
-       res.status(201).json(cohort);
+      .then(student => {
+       res.status(201).json(student);
       })
       .catch(error => {
         res.status(500).json(error);
@@ -60,10 +68,10 @@ router.post('/', (req, res) => {
     })
 });
 
-// localhost:4444/api/cohorts/:id
-// PUT update a cohort
+// localhost:4444/api/students/:id
+// PUT update a student
 router.put('/:id', (req, res) => {
-    db('cohorts')
+    db('students')
     .where({ id: req.params.id })
     .update(req.body)
     .then(count => {
@@ -78,10 +86,10 @@ router.put('/:id', (req, res) => {
     });
 });
 
-// localhost:4444/api/cohorts/:id
+// localhost:4444/api/students/:id
 // DELETE 
 router.delete('/:id', (req, res) => {
-    db('cohorts')
+    db('students')
     .where({ id: req.params.id })
     .del()
     .then(count => {
