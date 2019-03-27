@@ -12,8 +12,8 @@ const knexConfig = {
 
 const db = knex(knexConfig);
 
-// localhost:3300/api/cohorts
-// GET
+// localhost:4444/api/cohorts
+// GET all cohorts
 router.get('/', (req, res) => {
     db('cohorts')
     .then(cohorts => {
@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
     }); 
 });
 
-// localhost:3300/api/cohorts/:id
+// localhost:4444/api/cohorts/:id
 // GET by id
 router.get('/:id', (req, res) => {
     const { id } = req.params;
@@ -38,6 +38,26 @@ router.get('/:id', (req, res) => {
     .catch(error => {
       res.status(500).json(error);
     });
+});
+
+// localhost:4444/api/cohorts/
+// POST a new cohort
+router.post('/', (req, res) => {
+    db('cohorts')
+    .insert(req.body)
+    .then(ids => {
+      const id = ids[0];
+      db('cohorts')
+      .where({ id })
+      .first()
+      .then(cohort => {
+       res.status(201).json(cohort);
+      })
+      .catch(error => {
+        res.status(500).json(error);
+      });
+      
+    })
 });
 
 
